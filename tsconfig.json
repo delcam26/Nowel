@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "useDefineForClassFields": true,
+        "module":"ESNext",
+        "moduleResolution":"Node",
+        "strict":true,
+        "jsx": "preserve",
+        "resolveJsonModule":true,
+        "isolateModules":true,
+        "esModuleInterop":true,
+        "forceConsistentCasingInFileNames":true,
+        "skipLibCkeck":true,
+        "outDir":"./dist"
+    },
+    "include": ["src"],
+    "references":[]
+    }
