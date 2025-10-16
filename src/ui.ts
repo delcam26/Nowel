@@ -1,27 +1,26 @@
-import { Enigme} from "./data";
-import {validateAnswer} from "./main";
+import { Contact } from "./data"
 
-const gameContainer = document.getElementById ("game") as HTMLDivElement;
+const chat = document.getElementById("game") as HTMLDivElement
 
-export function showEnigme(enigme: Enigme) {
-    gameContainer.innerHTML=`
-    <div class="enigme">
-    <h2>${enigme.title}</h2>
-    <img src=".assets/images.${enigme.image}" alt=${enigme.title}" class="enigme-img'/>
-    <p>${enigme.question}</p>
-<input type="text" id="answer" placegolder="Ta réponse ..." class="answer_input"/>
-<button id="validationBtn" class="validate-btn"> Valider</button>
-${enigme.hint ? `<p class="hint"> Indice : ${enigme.hint}</p>`:""}
-</div>
-`;
+export function showMessage(from: Contact, text: string) {
+  const messageDiv = document.createElement("div")
+  messageDiv.className = "message"
 
-const validateBtn= document.getElementById("validateBtn") as HTMLButtonElement;
-const answerInput = document.getElementById("answer") as HTMLInputElement;
+  const avatar = document.createElement("img")
+  avatar.src = from.avatar
+  avatar.alt = from.name
+  avatar.className = "avatar"
 
-validateBtn.addEventListener("click",() => {
-    const answer = answerInput.value;
-    validateAnswer(answer);
-});
- }
- 
+  const bubble = document.createElement("div")
+  bubble.className = "bubble"
+  bubble.style.backgroundColor = from.color
+  bubble.textContent = text
 
+  messageDiv.appendChild(avatar)
+  messageDiv.appendChild(bubble)
+
+  chat.appendChild(messageDiv)
+
+  // Scroll automatique vers le bas
+  chat.scrollTop = chat.scrollHeight
+}
