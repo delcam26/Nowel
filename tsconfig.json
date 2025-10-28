@@ -7,10 +7,10 @@
         "strict":true,
         "jsx": "preserve",
         "resolveJsonModule":true,
-        "isolateModules":true,
+        "isolatedModules":true,
         "esModuleInterop":true,
         "forceConsistentCasingInFileNames":true,
-        "skipLibCkeck":true,
+        "skipLibCheck":true,
         "outDir":"./dist"
     },
     "include": ["src"],
