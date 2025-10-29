@@ -3,7 +3,6 @@ export interface Contact {
   name: string
   avatar: string
   color: string
-  messages: string[]
   score:number
   active?:boolean
 }
@@ -14,7 +13,8 @@ export interface Step {
   inputType?: "buttons" | "text";
   choices?: Choice[];
   nextStep?: string;
-  action?: "leave" | "join"; // 👈 nouveau
+  action?: "leave" | "join";
+  actionOrder?: "before" | "after"; 
 }
 
 export interface Choice {
@@ -29,25 +29,41 @@ export const contacts: Contact[] = [
     name: "Cosmo",
     avatar: "./assets/images/cosmo.jpg",
     color: "#9b5de5",
-    messages: [
-      "Hey 👋 c’est moi, Cosmo !",
-      "Prêt pour ton aventure de Noël ? 🎄"
-    ],
     score:0
-
   },
     {
     id: "blaaj",
     name: "blaaj",
     avatar: "./assets/images/requin.jpg",
     color: "#94bfe4ff",
-    messages: [
-      "Y a quoi à manger par ici ?",
-      "J'y crois pas, elle me fait parler dans son jeu stupide ta femelle ? "
-    ],
     score:0
   }
 ]
+export type ConversationType = "group" | "private";
+
+export interface Conversation {
+  id: string;
+  name: string;
+  avatar: string;
+  type: ConversationType;
+}
+
+export const conversations: Conversation[] = [
+  {
+    id: "group",
+    name: "Groupe principal 💬",
+    avatar: "./assets/images/group.jpg",
+    type: "group",
+  },
+  ...contacts.map(c => ({
+    id: c.id,
+    name: c.name,
+    avatar: c.avatar,
+    type: "private" as const, // <— important !
+  })),
+];
+
+
 export const story: Step[] = [
   {
     id: "intro",
@@ -62,7 +78,7 @@ export const story: Step[] = [
       },
       {
         text: "Hmm... pourquoi faire ?",
-        points: { data: 1 },
+        points: { cosmo : -1 },
         nextStep: "endgame"
       }
     ]
@@ -72,7 +88,7 @@ export const story: Step[] = [
     contactId: "cosmo",
     message: "Super ! Et comment tu t’appelles, héros ?",
     inputType: "text", 
-    nextStep: "entree_blaaj"
+    nextStep: "croc_blaaj"
   },
     {
     id: "endgame",
@@ -82,20 +98,16 @@ export const story: Step[] = [
   }
   ,
 {
-    id: "entree_blaaj",
-    contactId: "blaaj",
-    action: "join",
-    nextStep: "croc_blaaj"
-  },
-{
     id: "croc_blaaj",
     contactId: "blaaj",
-    message: "ça a l'air bon ça du {{playerName}}, j'en ferais bien mon 4h",
-    nextStep: "cosmo_cute"
+    message: "Ca a l'air bon ça du {{playerName}}, j'en ferais bien mon 4h",
+    nextStep: "cosmo_cute",
+    action: "join"
   },
   {
     id: "cosmo_cute",
     contactId: "cosmo",
     action: "leave",
+    message: "Je ne l'avais pas invité celui-là .."
   }
 ];

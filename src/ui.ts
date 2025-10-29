@@ -1,4 +1,4 @@
-
+//ui.ts
 import { contacts, Contact ,Step , Choice , story } from "./data";
 import { playStep } from "./main";
 import { gameState } from "./gameState";
@@ -75,31 +75,45 @@ export function showChoices(choices: Choice[]) {
   game.scrollTop = game.scrollHeight;
 }
 
-
 export function showTextInput(step: Step) {
   const inputContainer = document.getElementById("input-container")!;
-  inputContainer.classList.remove("hidden");
-
   const input = document.getElementById("user-input") as HTMLInputElement;
   const sendBtn = document.getElementById("send-btn") as HTMLButtonElement;
+  inputContainer.classList.remove("hidden");
+  input.focus();
 
   const handleSend = () => {
-    const text = input.value.trim();
-    if (text) {
+    const inputEl = document.getElementById("user-input") as HTMLInputElement;
+    console.log("---- NOUVEL ENVOI ----");
+    console.log("Événement déclenché à:", new Date().toLocaleTimeString());
+    console.log("Élément input trouvé:", inputEl);
+    console.log("Valeur de inputEl.value juste avant trim:", inputEl.value);
+    const text = inputEl.value.trim();
+    console.log("Valeur après trim:", text);  
+    if (text !== "") {
       addMessage("user", text);
       input.value = "";
       inputContainer.classList.add("hidden");
+
       sendBtn.removeEventListener("click", handleSend);
+      input.removeEventListener("keydown", handleKeyDown);
 
-      // 💾 On stocke la valeur pour plus tard
-      gameState["playerName"] = text;
+      if (step.id === "ask_name") {
+        gameState.playerName = text;
+        console.log("Nom enregistré dans gameState:", gameState.playerName);
+      }
 
-      playStep(step.nextStep!);
+      if (step.nextStep) {
+        playStep(step.nextStep);
+      } else {
+        console.warn(`Pas de nextStep défini pour ${step.id}`);
+      }
     }
   };
+
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // empêche le saut de ligne
+      e.preventDefault();
       handleSend();
     }
   };
@@ -116,7 +130,7 @@ export function showSystemMessage(text: string) {
   game.scrollTop = game.scrollHeight;
 }
 
-export function showTyping(contact: Contact, duration = 1500): Promise<void> {
+export function showTyping(contact: Contact, duration = 200): Promise<void> {
   return new Promise((resolve) => {
     const typing = document.createElement("div");
     typing.className = "message typing";
