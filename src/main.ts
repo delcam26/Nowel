@@ -18,7 +18,7 @@ const convId = params.get("conv");
 
 if (chatTitle && convId) {
   if (convId === "group") {
-    chatTitle.textContent = "Groupe principal 💬";
+    chatTitle.textContent = "Groupe principal ";
   } else {
     const contact = contacts.find(c => c.id === convId);
     chatTitle.textContent = contact ? contact.name : "Conversation";
@@ -39,6 +39,7 @@ export function showMenu() {
   conversationList.innerHTML = "";
 
   conversations.forEach(conv => {
+    if (!conv.visible) return;
     const item = document.createElement("div");
     item.className = "conversation";
     item.innerHTML = `

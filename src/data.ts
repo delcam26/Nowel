@@ -3,8 +3,9 @@ export interface Contact {
   name: string
   avatar: string
   color: string
-  score:number
-  active?:boolean
+  score: number
+  active?: boolean
+  visible: boolean
 }
 export interface Step {
   id: string;
@@ -29,14 +30,16 @@ export const contacts: Contact[] = [
     name: "Cosmo",
     avatar: "./assets/images/cosmo.jpg",
     color: "#9b5de5",
-    score:0
+    score:0,
+    visible: false ,
   },
     {
     id: "blaaj",
     name: "blaaj",
     avatar: "./assets/images/requin.jpg",
     color: "#94bfe4ff",
-    score:0
+    score:0,
+    visible:false,
   }
 ]
 export type ConversationType = "group" | "private";
@@ -46,6 +49,7 @@ export interface Conversation {
   name: string;
   avatar: string;
   type: ConversationType;
+ visible: boolean;
 }
 
 export const conversations: Conversation[] = [
@@ -54,12 +58,14 @@ export const conversations: Conversation[] = [
     name: "Groupe principal 💬",
     avatar: "./assets/images/group.jpg",
     type: "group",
+     visible: true,
   },
   ...contacts.map(c => ({
     id: c.id,
     name: c.name,
     avatar: c.avatar,
     type: "private" as const, // <— important !
+    visible: c.visible
   })),
 ];
 
