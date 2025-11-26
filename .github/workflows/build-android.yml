@@ -1,0 +1,61 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:    # Permet de lancer manuellement depuis GitHub
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout du code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Installer Node + npm
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      # 3. Installer les dépendances
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. Build du projet web
+      - name: Build Web App
+        run: npm run build
+
+      # 5. Installer Capacitor Android
+      - name: Install Capacitor Android
+        run: npm install @capacitor/android
+
+      # 6. Synchronisation Capacitor
+      - name: Capacitor Sync
+        run: npx cap sync android
+
+      # 7. Installer JDK 17 pour Gradle/Android
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+
+      # 8. Installer Android SDK
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      # 9. Build APK Debug
+      - name: Build Debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug
+
+      # 10. Upload l'APK en artifact téléchargeable
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug.apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
