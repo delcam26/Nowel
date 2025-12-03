@@ -1,15 +1,16 @@
+import { gameState, GameState } from "./gameState";
 export interface Contact {
   id: string
   name: string
   avatar: string
   color: string
-  score: number
+  bio: string
   active?: boolean
   visible: boolean
 }
 export interface Step {
   id: string;
-  contactId: string;
+  contactId:String;
   message?: string;
   inputType?: "buttons" | "text";
   choices?: Choice[];
@@ -20,8 +21,8 @@ export interface Step {
 
 export interface Choice {
   text: string;
-  points: { [contactId: string]: number };
   nextStep: string;
+  personalityPoints?: Partial<GameState["personalities"]>;
 }
 
 export const contacts: Contact[] = [
@@ -30,15 +31,15 @@ export const contacts: Contact[] = [
     name: "Cosmo",
     avatar: "./assets/images/cosmo.jpg",
     color: "#9b5de5",
-    score:0,
-    visible: false ,
+    bio: "blahblahblah",
+    visible: true ,
   },
     {
     id: "blaaj",
     name: "blaaj",
     avatar: "./assets/images/requin.jpg",
     color: "#94bfe4ff",
-    score:0,
+    bio: "blahblahblah",
     visible:false,
   }
 ]
@@ -69,51 +70,53 @@ export const conversations: Conversation[] = [
   })),
 ];
 
-
 export const story: Step[] = [
   {
-    id: "intro",
+    id: "intro_cosmo",
     contactId: "cosmo",
-    message: "Hey ! Tu veux aider à sauver Noël ? 🎄",
-    inputType: "buttons",
-    choices: [
-      {
-        text: "Évidemment !",
-        points: { cosmo: 2 },
-        nextStep: "ask_name"
-      },
-      {
-        text: "Hmm... pourquoi faire ?",
-        points: { cosmo : -1 },
-        nextStep: "endgame"
-      }
-    ]
+    message: "Salut toi ! Je t'ai rajouté à la conversation de groupe pour que tu ait les infos concernant la fête de ce soir",
+    nextStep: "intro_blahj",
   },
-  {
-    id: "ask_name",
-    contactId: "cosmo",
-    message: "Super ! Et comment tu t’appelles, héros ?",
-    inputType: "text", 
-    nextStep: "croc_blaaj"
+
+ {
+    id: "intro_blahj",
+    contactId: "blahj",
+    message: "C'est qui lui ?",
+    inputType: "text",
+    action: "join",
+    nextStep: "croc_blaaj",
   },
-    {
-    id: "endgame",
-    contactId: "cosmo",
-    message: "OK...si c'est comme ça alors salut !",
-    action: "leave",
-  }
-  ,
 {
     id: "croc_blaaj",
     contactId: "blaaj",
     message: "Ca a l'air bon ça du {{playerName}}, j'en ferais bien mon 4h",
-    nextStep: "cosmo_cute",
-    action: "join"
+    nextStep: "stuck_house",
   },
+
+  // --- DÉBUT DE TON HISTOIRE COSMO BLOQUÉ ---
   {
-    id: "cosmo_cute",
-    contactId: "cosmo",
-    action: "leave",
-    message: "Je ne l'avais pas invité celui-là .."
+    id: "stuck_house",
+    contactId:"cosmo",
+    message: "Je suis rentrée par erreur chez une humaine… et elle a fermé la fenêtre derrière moi ! 😰 Je fais quoi ?",
+    inputType: "buttons",
+    choices: [
+      {
+        text: "Donne-moi l’adresse, j’arrive à la rescousse !",
+        personalityPoints: { dog: 1 },
+        nextStep: "A1_bambi"
+      },
+      {
+        text: "Elle dort ? Si oui attends demain sinon cage directe.",
+        personalityPoints: { owl: 1 },
+        nextStep: "B1_human_approaches"
+      },
+      {
+        text: "Si je viens t’aider… tu me rends un petit service ? 😏",
+        personalityPoints: { dragon: 1 },
+        nextStep: "C1_flirt"
+      }
+    ]
   }
+
+
 ];
