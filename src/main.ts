@@ -1,7 +1,7 @@
 import "/style.css";
 import { contacts, Contact ,Step , Choice , story , conversations} from "./data";
 import { gameState, GameState } from "./gameState";
-import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage,resetGameState } from "./ui"; 
+import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage } from "./ui"; 
 
 // --- Mise à jour du titre du chat ---
 const chatTitle = document.getElementById("chat-title");
@@ -72,7 +72,6 @@ export function showContactDetails(contactId: string) {
   const score = document.createElement("div");
   score.className = "contact-score";
   const points = gameState.scores[contact.id] || 0;
-  score.textContent = `❤️ ${points} points d'affinité`;
   game.appendChild(score);
 
   // --- Description / bio ---
@@ -93,104 +92,101 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Ouvrir une conversation ---
-export function openChat(convId: string, type: "group" | "private") {
+export async function openChat(convId: string, type: "group" | "private") {
+  // Masquer le menu, afficher le chat
   menuPage.classList.remove("active");
   chatPage.classList.add("active");
   inputContainer.classList.remove("hidden");
-  const game = document.getElementById("game")!;
-  game.innerHTML = "";
 
+  const gameDiv = document.getElementById("game")!;
+  gameDiv.innerHTML = ""; // On vide l'affichage, pas l'historique
+
+  // --- Recharger l'état sauvegardé si existant --- pour linsant ça bug
+  //const saved = localStorage.getItem("gameState");
+  //if (saved) Object.assign(gameState, JSON.parse(saved));
+
+  // --- Afficher l'historique ---
+  //for (const msg of gameState.history) {
+  //  if (msg.type === "user") {
+  //    addMessage("user", msg.message, true);
+  //  } else {
+  //    const contact = contacts.find(c => c.id === msg.contactId);
+   //   if (contact) addMessage(contact, msg.message, false);
+    //}
+  //}
+
+  // --- Déterminer si c'est un chat de groupe ou privé ---
   if (type === "group") {
-    // Restaurer l’historique
-    console.log("gameState au chargement de la page:", gameState);
-    console.log(gameState.history);
-    
-  //recuperer l'historique
-  const saved = localStorage.getItem("gameState");
-  if (saved) Object.assign(gameState, JSON.parse(saved));
+    // Step en cours
+    const step = story.find(s => s.id === gameState.currentStep);
 
-    for (const msg of gameState.history) {
-  if (msg.contactId === "user") {
-    addMessage("user", msg.message, true);
-  } else {
-    const contact = contacts.find(c => c.id === msg.contactId);
-    if (contact) addMessage(contact, msg.message, false);
-  }
-}
+    if (!step) return;
 
-    // Ne lancer le scénario qu'une seule fois
-    if (!gameState.started) {
-      gameState.started = true;
-      playStep("intro_cosmo");
-     } else {
-      // Relancer le step en cours
-      const step = story.find(s => s.id === gameState.currentStep);
-      if (step?.inputType === "buttons" && step.choices) {
-        showChoices(step.choices);
-      } else if (step?.inputType === "text") {
-        showTextInput(step);
-      }
-    }
+    // Afficher le step courant
+    await playStep(step.id, { replay: true });
+
   } else {
-    //  Conversation individuelle
+    // Conversation individuelle
     const contact = contacts.find(c => c.id === convId);
-    if (contact) {
-      const contactsBtn = document.createElement("button");
-      contactsBtn.textContent = "Info contact";
-      contactsBtn.className = "contacts-btn";
-      contactsBtn.onclick = () => showContactDetails(contact.id);
-      game.appendChild(contactsBtn);
+    if (!contact) return;
 
-      const msg = document.createElement("div");
-      msg.className = "system-message";
-      msg.textContent = `Conversation privée avec ${contact.name} (en cours de développement )`;
-      game.appendChild(msg);
-    }
+    const contactsBtn = document.createElement("button");
+    contactsBtn.textContent = "Info contact";
+    contactsBtn.className = "contacts-btn";
+    contactsBtn.onclick = () => showContactDetails(contact.id);
+    gameDiv.appendChild(contactsBtn);
+
+    const msg = document.createElement("div");
+    msg.className = "system-message";
+    msg.textContent = `Conversation privée avec ${contact.name} (en cours de développement 💬)`;
+    gameDiv.appendChild(msg);
   }
 }
 // --- Enchainement des steps ---
-export async function playStep(stepId: string) {
-  await new Promise(r => setTimeout(r, 1000));
+export async function playStep(stepId: string, options?: { replay?: boolean }) {
   const step = story.find(s => s.id === stepId);
-  if (!step) return; //quitter si pas de step
-  gameState.currentStep = step.id; //ou en est-on dans l'histoire
-  const contact = contacts.find(c => c.id === step.contactId);
-  if (!contact) return; //quitter si pas de contact
+  if (!step) return;
 
-  //  Affichage du message (si présent) en prenant en compte les variables en fonciton du step
- if (step.message) {
-   console.log("Message à afficher");
-    await showTyping(contact);
-    console.log(" gameState avant affichage :", gameState);
+  gameState.currentStep = step.id;
+
+  const contact = contacts.find(c => c.id === step.contactId);
+  if (!contact) return;
+
+  // Affichage du message si présent
+  if (step.message) {
+    if (!options?.replay) await showTyping(contact);
     const message = step.message.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
       const k = key as keyof typeof gameState;
       return gameState[k]?.toString() || "";
     });
+
     addMessage(contact, message);
   }
-    // Gestion des entrées/sorties 
+
+  // Actions join/leave
   if (step.action === "leave") {
     showSystemMessage(`${contact.name} a quitté la conversation.`);
     contact.active = false;
-    return; 
   }
   if (step.action === "join") {
     showSystemMessage(`${contact.name} a rejoint la conversation.`);
     contact.active = true;
   }
-  //  Gestion du type d’interaction
+
+  // Gestion du type d'interaction
   if (step.inputType === "buttons" && step.choices) {
     showChoices(step.choices);
-    
-    return;
+    return; // Attente de la réponse de l'utilisateur
   }
+
   if (step.inputType === "text") {
     showTextInput(step);
-    return;
+    return; // Attente de l'utilisateur
   }
-  //  Sinon, passe automatiquement au suivant
+
+  // Sinon, step suivant automatique
   if (step.nextStep) {
-    playStep(step.nextStep);
+    await playStep(step.nextStep);
   }
 }
 

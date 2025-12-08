@@ -77,7 +77,6 @@ export const story: Step[] = [
     message: "Salut toi ! Je t'ai rajouté à la conversation de groupe pour que tu ait les infos concernant la fête de ce soir",
     nextStep: "intro_blahj",
   },
-
  {
     id: "intro_blahj",
     contactId: "blahj",

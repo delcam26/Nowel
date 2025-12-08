@@ -191,12 +191,3 @@ export function showTyping(contact: Contact, duration = 200): Promise<void> {
     }, duration);
   });
 }
-// Pour réintialiser le jeu (utile debug pour le moment)
-export function resetGameState() {
-  gameState.playerName = "";
-  gameState.scores = {};
-  gameState.currentStep = "intro";
-  gameState.history = [];
-  gameState.started = false; 
-  console.log("GameState réinitialisé :", gameState);
-}
