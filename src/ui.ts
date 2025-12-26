@@ -15,7 +15,7 @@ export function addMessage(
   text: string,
   save = true
 ) {
-  console.log("✅ addMessage appelé :", author, text);
+  //console.log("addMessage appelé :", author, text);
   const message = document.createElement("div");
   message.classList.add("message");
 
@@ -25,13 +25,21 @@ export function addMessage(
 
   if (author.type === "user") {
     message.classList.add("user");
-
     const avatar = document.createElement("img");
     avatar.className = "avatar";
-    avatar.src = "./assets/images/icone_origine.png"; 
+    const dominant =getDominantPersonality (gameState.personalities);
+    if (dominant === null) {
+      avatar.src = "./assets/images/icone_origine.png";
+      console.log("Aucune personnalité dominante");
+    }
+    else {
+    const niveau = getLevel (dominant);
+    avatar.src = "./assets/images/"+dominant+niveau+".png";  //+ au lieu de , sinon y a un espace auto
+    console.log ("Personnalité dominante : "+dominant+niveau+".png");
+  }
+
     message.appendChild(avatar);
     message.appendChild(bubble);
-
 
   } else if (author.type === "system") {
     message.classList.add("system-message");
@@ -57,8 +65,6 @@ export function addMessage(
     chat.scrollTop = chat.scrollHeight;
   });
 }
-
-
 export function applyPersonalityPoints(
   pts: Partial<GameState["personalities"]>,
   state: GameState
@@ -67,13 +73,31 @@ export function applyPersonalityPoints(
     state.personalities[key as keyof GameState["personalities"]] += value!;
   });
 }
-
-export function getDominantPersonality(points: PersonalityPoints): Personality {
+export function getDominantPersonality(
+  points: PersonalityPoints
+): Personality | null {
   const entries = Object.entries(points) as [Personality, number][];
-  entries.sort((a, b) => b[1] - a[1]);
-  return entries[0][0];
-}
 
+  // Trouver le score maximal
+  const maxValue = Math.max(...entries.map(([_, value]) => value));
+
+  // Toutes les personnalités qui ont ce score maximal
+  const topPersonalities = entries
+    .filter(([_, value]) => value === maxValue)
+    .map(([key]) => key);
+
+  // Si plusieurs ont le même score, il n'y a pas de dominante
+  if (topPersonalities.length !== 1) return null;
+
+  return topPersonalities[0];
+}
+export function getLevel(personnality: Personality): number {
+  const score = gameState.personalities[personnality];
+  if (score == 1) return 1;
+  if (score <=2 && score >1) return  2;
+  if (score > 2) return 3;
+  return 0;
+}
 export function showChoices(choices: Choice[]) {
   const container = document.createElement("div");
   container.className = "choices";
@@ -83,10 +107,13 @@ export function showChoices(choices: Choice[]) {
     btn.textContent = choice.text;
 
     btn.onclick = () => {
-      addMessage({ type: "user"}, choice.text);
       if (choice.personalityPoints) {
         applyPersonalityPoints(choice.personalityPoints, gameState);
+        //loger les pts et la personnalité dominante
+        console.log("Les points sont :",gameState.personalities);
+        console.log ("Personnalité dominante : ",getDominantPersonality(gameState.personalities));
       }
+      addMessage({ type: "user"}, choice.text);
 
       container.remove();
       playStep(choice.nextStep);
@@ -98,11 +125,18 @@ export function showChoices(choices: Choice[]) {
   chat.appendChild(container);
   requestAnimationFrame(() => {
   chat.scrollTop = chat.scrollHeight;
-  console.log("scrollTop:", chat.scrollTop, "/", chat.scrollHeight);
+  //console.log("scrollTop:", chat.scrollTop, "/", chat.scrollHeight);
 
 })
 }
-
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array]; // copier pour ne pas muter l'original
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 export function showTextInput(step: Step) {
   const inputContainer = document.getElementById("input-container")!;
   const input = document.getElementById("user-input") as HTMLInputElement;
@@ -123,7 +157,7 @@ export function showTextInput(step: Step) {
 
       if (step.id === "intro_blaaj") {
         gameState.playerName = text;
-        console.log("Nom enregistré dans gameState:", gameState.playerName);
+        //console.log("Nom enregistré dans gameState:", gameState.playerName);
       }
 
       if (step.nextStep) {
@@ -144,7 +178,6 @@ export function showTextInput(step: Step) {
   sendBtn.addEventListener("click", handleSend);
   input.addEventListener("keydown", handleKeyDown);
 }
-
 export function showSystemMessage(text: string) {
   const message = document.createElement("div");
   message.className = "system-message";
@@ -154,7 +187,6 @@ export function showSystemMessage(text: string) {
   chat.scrollTop = chat.scrollHeight
 })
 }
-
 export function showTyping(contact: Contact, duration = 200): Promise<void> {
   return new Promise((resolve) => {
     const typing = document.createElement("div");

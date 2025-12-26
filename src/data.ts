@@ -64,7 +64,7 @@ export interface Conversation {
 export const conversations: Conversation[] = [
   {
     id: "group",
-    name: "Groupe principal 💬",
+    name: "Let's Party",
     avatar: "./assets/images/group.jpg",
     type: "group",
      visible: true,
@@ -206,7 +206,7 @@ export const story: Step[] = [
      {
     id: "2_sauvee",
     contactId:"cosmo",
-    message: "C'est bon une autre dame est venue me jeter dehors, j'arrive les gars.{{playerName}} tu veux que je t'accompagne à la soirée ou on se renjoint là bas ? ",
+    message: "C'est bon une autre dame est venue me jeter dehors, j'arrive les gars. {{playerName}}, tu veux que je t'accompagne à la soirée ou on se renjoint là bas ? ",
     inputType: "buttons",
         choices: [
       {

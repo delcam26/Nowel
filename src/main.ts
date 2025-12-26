@@ -1,7 +1,7 @@
 import "/style.css";
 import { contacts, Contact ,Step , Choice , story , conversations} from "./data";
 import { gameState, GameState } from "./gameState";
-import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage } from "./ui"; 
+import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage,getDominantPersonality,shuffleArray } from "./ui"; 
 
 // --- Mise à jour du titre du chat ---
 const chatTitle = document.getElementById("chat-title");
@@ -175,7 +175,8 @@ export async function playStep(stepId: string, options?: { replay?: boolean }) {
 
   // Gestion du type d'interaction
   if (step.inputType === "buttons" && step.choices) {
-    showChoices(step.choices);
+     const randomChoices = shuffleArray(step.choices);
+     showChoices(randomChoices);
     return; // Attente de la réponse de l'utilisateur
   }
 
@@ -186,7 +187,6 @@ export async function playStep(stepId: string, options?: { replay?: boolean }) {
 
   // Sinon, step suivant automatique
   if (step.nextStep) {
-    console.log("Les points sont :",gameState.personalities);
     await playStep(step.nextStep);
   }
 }
