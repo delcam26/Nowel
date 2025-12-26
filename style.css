@@ -70,10 +70,11 @@ body {
 
 /* Message générique */
 .message {
+  margin: 8px 0;
   display: flex;
   align-items: flex-end;
   gap: 8px;
-  max-width: 100%;
+  width: 100%;
 }
 
 /* Avatar */
@@ -105,7 +106,7 @@ body {
 
 /* ---------------- USER (droite) ---------------- */
 .message.user {
-  justify-content: flex-end;
+  justify-content: flex-start; /* j'ai déjà un row revers donc attention aligner à gauche */
   flex-direction: row-reverse; /* inverse avatar <-> bulle */
 }
 

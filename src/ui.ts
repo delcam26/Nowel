@@ -15,6 +15,7 @@ export function addMessage(
   text: string,
   save = true
 ) {
+  console.log("✅ addMessage appelé :", author, text);
   const message = document.createElement("div");
   message.classList.add("message");
 
@@ -27,7 +28,7 @@ export function addMessage(
 
     const avatar = document.createElement("img");
     avatar.className = "avatar";
-    avatar.src = "/avatars/user.png"; // à adapter
+    avatar.src = "./assets/images/icone_origine.png"; 
     message.appendChild(avatar);
     message.appendChild(bubble);
 
@@ -82,7 +83,7 @@ export function showChoices(choices: Choice[]) {
     btn.textContent = choice.text;
 
     btn.onclick = () => {
-      addMessage({ type: "contact", contact: contacts.find(c => c.id === "user")! }, choice.text);
+      addMessage({ type: "user"}, choice.text);
       if (choice.personalityPoints) {
         applyPersonalityPoints(choice.personalityPoints, gameState);
       }
