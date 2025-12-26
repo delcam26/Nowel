@@ -152,7 +152,7 @@ export async function playStep(stepId: string, options?: { replay?: boolean }) {
   const contact = contacts.find(c => c.id === step.contactId);
   if (!contact) return;
 
-  // Affichage du message si présent
+  // Affichage du message si présent (avec le nom du joueur si besoin)
   if (step.message) {
     if (!options?.replay) await showTyping(contact);
     const message = step.message.replace(/\{\{(\w+)\}\}/g, (_, key: string) => {
@@ -160,7 +160,7 @@ export async function playStep(stepId: string, options?: { replay?: boolean }) {
       return gameState[k]?.toString() || "";
     });
 
-    addMessage(contact, message);
+    addMessage({ type: "contact", contact }, message);
   }
 
   // Actions join/leave
@@ -186,6 +186,7 @@ export async function playStep(stepId: string, options?: { replay?: boolean }) {
 
   // Sinon, step suivant automatique
   if (step.nextStep) {
+    console.log("Les points sont :",gameState.personalities);
     await playStep(step.nextStep);
   }
 }

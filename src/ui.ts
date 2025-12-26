@@ -3,75 +3,60 @@ import { contacts, Contact ,Step , Choice , story } from "./data";
 import { playStep,showContactDetails } from "./main";
 import { GameState,gameState } from "./gameState";
 import { Personality,PersonalityPoints } from "./personnality";
+type MessageAuthor =
+  | { type: "user" }
+  | { type: "system" }
+  | { type: "contact"; contact: Contact };
 
-const game = document.getElementById("game") as HTMLElement;
-const chat = document.getElementById("game") as HTMLDivElement
-
+const chat = document.getElementById("game") as HTMLElement;
 
 export function addMessage(
-  contact: Contact | "user" | "system",
+  author: MessageAuthor,
   text: string,
   save = true
 ) {
   const message = document.createElement("div");
-  message.className = "message";
+  message.classList.add("message");
 
   const bubble = document.createElement("div");
   bubble.className = "bubble";
   bubble.textContent = text;
 
-  if (contact === "user") {
+  if (author.type === "user") {
     message.classList.add("user");
-  } else if (contact === "system") {
+
+    const avatar = document.createElement("img");
+    avatar.className = "avatar";
+    avatar.src = "/avatars/user.png"; // à adapter
+    message.appendChild(avatar);
+    message.appendChild(bubble);
+
+
+  } else if (author.type === "system") {
     message.classList.add("system-message");
+    message.appendChild(bubble);
+
   } else {
+    const { contact } = author;
+
     const avatar = document.createElement("img");
     avatar.src = contact.avatar;
     avatar.alt = contact.name;
     avatar.className = "avatar";
-    bubble.style.backgroundColor = contact.color || "#9b5de5";
+
+    bubble.style.backgroundColor = contact.color;
+
     message.appendChild(avatar);
+    message.appendChild(bubble);
   }
 
-  message.appendChild(bubble);
-  game.appendChild(message);
-  game.scrollTop = game.scrollHeight;
+  chat.appendChild(message);
 
-  if (save) {
-    let id: string;
-    if (contact === "user") id = "user";
-    else if (contact === "system") id = "system";
-    else id = contact.id;
-
-    gameState.history.push({ contactId: id, message: text, type: contact === "user" ? "user" : contact === "system" ? "system" : "contact" });
-    localStorage.setItem("gameState", JSON.stringify(gameState));
-  }
+  requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+  });
 }
 
-export function showMessage(from: Contact, text: string) {
-  const messageDiv = document.createElement("div")
-  messageDiv.className = "message"
-
-  const avatar = document.createElement("img")
-  avatar.src = from.avatar
-  avatar.alt = from.name
-  avatar.className = "avatar"
-  avatar.style.cursor = "pointer";
-  avatar.onclick = () => showContactDetails(from.id);
-
-  const bubble = document.createElement("div")
-  bubble.className = "bubble"
-  bubble.style.backgroundColor = from.color
-  bubble.textContent = text
-
-  messageDiv.appendChild(avatar)
-  messageDiv.appendChild(bubble)
-
-  chat.appendChild(messageDiv)
-
-  // Scroll automatique vers le bas
-  chat.scrollTop = chat.scrollHeight
-}
 
 export function applyPersonalityPoints(
   pts: Partial<GameState["personalities"]>,
@@ -97,8 +82,7 @@ export function showChoices(choices: Choice[]) {
     btn.textContent = choice.text;
 
     btn.onclick = () => {
-      addMessage("user", choice.text);
-
+      addMessage({ type: "contact", contact: contacts.find(c => c.id === "user")! }, choice.text);
       if (choice.personalityPoints) {
         applyPersonalityPoints(choice.personalityPoints, gameState);
       }
@@ -110,10 +94,13 @@ export function showChoices(choices: Choice[]) {
     container.appendChild(btn);
   });
 
-  game.appendChild(container);
-  game.scrollTop = game.scrollHeight;
-}
+  chat.appendChild(container);
+  requestAnimationFrame(() => {
+  chat.scrollTop = chat.scrollHeight;
+  console.log("scrollTop:", chat.scrollTop, "/", chat.scrollHeight);
 
+})
+}
 
 export function showTextInput(step: Step) {
   const inputContainer = document.getElementById("input-container")!;
@@ -126,14 +113,14 @@ export function showTextInput(step: Step) {
     const inputEl = document.getElementById("user-input") as HTMLInputElement;
     const text = inputEl.value.trim(); 
     if (text !== "") {
-      addMessage("user", text);
+      addMessage({ type: "user" }!, text);
       input.value = "";
       inputContainer.classList.add("hidden");
 
       sendBtn.removeEventListener("click", handleSend);
       input.removeEventListener("keydown", handleKeyDown);
 
-      if (step.id === "ask_name") {
+      if (step.id === "intro_blaaj") {
         gameState.playerName = text;
         console.log("Nom enregistré dans gameState:", gameState.playerName);
       }
@@ -161,8 +148,10 @@ export function showSystemMessage(text: string) {
   const message = document.createElement("div");
   message.className = "system-message";
   message.textContent = text;
-  game.appendChild(message);
-  game.scrollTop = game.scrollHeight;
+  chat.appendChild(message);
+  requestAnimationFrame(() => {
+  chat.scrollTop = chat.scrollHeight
+})
 }
 
 export function showTyping(contact: Contact, duration = 200): Promise<void> {
@@ -182,8 +171,8 @@ export function showTyping(contact: Contact, duration = 200): Promise<void> {
 
     typing.appendChild(avatar);
     typing.appendChild(bubble);
-    game.appendChild(typing);
-    game.scrollTop = game.scrollHeight;
+    chat.appendChild(typing);
+    chat.scrollTop = chat.scrollHeight;
 
     setTimeout(() => {
       typing.remove();

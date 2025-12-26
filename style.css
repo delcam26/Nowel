@@ -1,64 +1,171 @@
- /* --- Layout général --- */
- 
-/*menu contacts*/
-.contacts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 1rem;
+/* --- Reset & base --- */
+* {
+  box-sizing: border-box;
 }
 
-.contact-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff2;
-  padding: 10px 15px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.contact-card img.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.contact-card span {
-  font-weight: 500;
-}
-
-.back-btn {
-  display: block;
-  margin: 20px auto;
-  background: #9b5de5;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 16px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-/*page principale*/
 body {
-  background: #dfe6e9;
-  font-family: "Arial", sans-serif;
   margin: 0;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  background: #dfe6e9;
+  font-family: Arial, sans-serif;
 }
+
+/* --- Pages --- */
 .page {
   display: none;
 }
 
 .page.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
+/* --- Phone container --- */
+.phone {
+  width: 360px;
+  height: 100vh;
+  margin: 20px auto;
+  border-radius: 30px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  background: #f8f9fb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- Header chat --- */
+.chat-header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #9b5de5, #f15bb5);
+  color: white;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.chat-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+/* --- Zone de chat --- */
+#game {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  background: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Message générique */
+.message {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 100%;
+}
+
+/* Avatar */
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Bulle */
+.bubble {
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 70%;
+  word-wrap: break-word;
+  color: white;
+  background: #9b5de5;
+}
+
+/* ---------------- CONTACT (gauche) ---------------- */
+.message:not(.user) {
+  justify-content: flex-start;
+}
+
+.message:not(.user) .bubble {
+  border-top-left-radius: 0;
+}
+
+/* ---------------- USER (droite) ---------------- */
+.message.user {
+  justify-content: flex-end;
+  flex-direction: row-reverse; /* inverse avatar <-> bulle */
+}
+
+.message.user .bubble {
+  background: #a7a1a1;
+  color: white;
+  border-top-right-radius: 0;
+}
+
+/* ---------------- SYSTEM ---------------- */
+.system-message {
+  justify-content: center;
+}
+
+.system-message .bubble {
+  background: transparent;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* --- Input bar --- */
+.input-bar {
+  flex-shrink: 0;
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: #fff;
+}
+
+.input-bar input {
+  flex: 1;
+  border: none;
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 20px;
+  outline: none;
+}
+
+.input-bar button {
+  border: none;
+  background: #9b5de5;
+  color: white;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+/* --- Scrollbar (optionnel) --- */
+#game::-webkit-scrollbar {
+  width: 6px;
+}
+
+#game::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+/* --- Utils --- */
 .hidden {
   display: none !important;
 }
@@ -103,7 +210,7 @@ body {
 /* --- Conteneur type téléphone --- */
 .phone {
   width: 360px;
-  height: 640px;
+  height: 100vh;
   margin: 40px auto;
   border-radius: 30px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
@@ -123,88 +230,6 @@ body {
   font-size: 1.2rem;
 }
 
-
-/* --- Zone de chat --- */
-#game {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  background: #f8f9fa;
-}
-
-.message {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 12px;
-}
-
-.avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  margin-right: 8px;
-  flex-shrink: 0;
-}
-
-.bubble {
-  color: white;
-  padding: 8px 12px;
-  border-radius: 16px;
-  border-top-left-radius: 0;
-  max-width: 70%;
-  word-wrap: break-word;
-}
-/* Partie joueur alignee a gauche */
-.message.user {
-  justify-content: flex-end; /* aligne à droite */
-}
-.message.user .avatar {
-  display: none; /* On cache l'avatar du joueur */
-}
-.message.user .bubble {
-  background-color: rgb(167, 161, 161);
-  color: #ffffff;
-  border-radius: 16px;
-  border-top-right-radius: 0; /* angle ouvert à droite */
-  border-top-left-radius: 16px; /* angle fermé à gauche */
-  text-align: right;
-}
-/* --- connect/deconnect */
-.system-message {
-  text-align: center;
-  color: #aaa;
-  font-size: 0.9rem;
-  margin: 10px 0;
-  font-style: italic;
-}
-/* --- Barre d'entree --- */
-.input-bar {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #ddd;
-  background: #fff;
-}
-
-.input-bar input {
-  flex: 1;
-  border: none;
-  background: #f1f1f1;
-  padding: 10px;
-  border-radius: 20px;
-  outline: none;
-}
-
-.input-bar button {
-  border: none;
-  background: #9b5de5;
-  color: white;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  margin-left: 8px;
-  cursor: pointer;
-  font-weight: bold;
-}
 
 /* ---- Differents choix --- */
 
@@ -256,27 +281,6 @@ body {
   0%, 100% { opacity: 0.3; }
   50% { opacity: 1; }
 }
-/* Barre supérieure du chat */
-.chat-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #9b5de5, #f15bb5);
-  color: white;
-  padding: 12px 16px;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
 
-.chat-header button {
-  background: transparent;
-  border: none;
-  color: rgb(111, 75, 75);
-  font-size: 1.4rem;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
 
-.chat-header button:hover {
-  transform: scale(1.1);
-}
+
