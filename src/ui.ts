@@ -1,5 +1,5 @@
 //ui.ts
-import { contacts, Contact ,Step , Choice , story } from "./data";
+import { contacts, Contact ,Step , Choice , story, conversations } from "./data";
 import { playStep,showContactDetails } from "./main";
 import { GameState,gameState } from "./gameState";
 import { Personality,PersonalityPoints } from "./personnality";
@@ -9,12 +9,15 @@ type MessageAuthor =
   | { type: "contact"; contact: Contact };
 
 const chat = document.getElementById("game") as HTMLElement;
+const params = new URLSearchParams(window.location.search);
+let convId = params.get("conv");
 
 export function addMessage(
   author: MessageAuthor,
   text: string,
-  save = true
+  chatId?: string
 ) {
+   const isCurrentChat = chatId === convId; 
   //console.log("addMessage appelé :", author, text);
   const message = document.createElement("div");
   message.classList.add("message");
@@ -46,7 +49,7 @@ export function addMessage(
     message.appendChild(bubble);
 
   } else {
-    const { contact } = author;
+    const {contact} = author;
 
     const avatar = document.createElement("img");
     avatar.src = contact.avatar;
@@ -60,6 +63,14 @@ export function addMessage(
   }
 
   chat.appendChild(message);
+
+  // Si le chat n'est pas ouvert, incrémente le compteur
+  if (!isCurrentChat) {
+    const conv = conversations.find(c => c.id === chatId);
+    if (conv) {
+      conv.unread = (conv.unread || 0) + 1;;
+    }
+  }
 
   requestAnimationFrame(() => {
     chat.scrollTop = chat.scrollHeight;
@@ -129,7 +140,7 @@ export function showChoices(choices: Choice[]) {
 
 })
 }
-function shuffleArray<T>(array: T[]): T[] {
+export function shuffleArray<T>(array: T[]): T[] {
   const arr = [...array]; // copier pour ne pas muter l'original
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

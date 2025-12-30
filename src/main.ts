@@ -6,11 +6,12 @@ import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage,ge
 // --- Mise à jour du titre du chat ---
 const chatTitle = document.getElementById("chat-title");
 const params = new URLSearchParams(window.location.search);
-const convId = params.get("conv");
+let convId = params.get("conv");
 const menuPage = document.getElementById("menu-page")!;
 const chatPage = document.getElementById("chat-page")!;
 const conversationList = document.getElementById("conversation-list")!;
 const inputContainer = document.getElementById("input-container")!;
+
 
 window.addEventListener("beforeunload", () => {
   localStorage.setItem("gameState", JSON.stringify(gameState));
@@ -31,16 +32,18 @@ export function showMenu() {
   inputContainer.classList.add("hidden");
   conversationList.innerHTML = "";
 
-  conversations.forEach(conv => {
-    if (!conv.visible) return;
-    const item = document.createElement("div");
-    item.className = "conversation";
-    item.innerHTML = `
-      <img src="${conv.avatar}" alt="${conv.name}">
-      <div class="conversation-name">${conv.name}</div>
-    `;
-    item.onclick = () => openChat(conv.id, conv.type);
-    conversationList.appendChild(item);
+conversations.forEach(conv => {
+  if (!conv.visible) return;
+
+  const item = document.createElement("div");
+  item.className = "conversation";
+  item.innerHTML = `
+    <img src="${conv.avatar}" alt="${conv.name}">
+    <div class="conversation-name">${conv.name}</div>
+    ${conv.unread ? `<span class="badge">${conv.unread}</span>` : ""}
+  `;
+  item.onclick = () => openChat(conv.id, conv.type);
+  conversationList.appendChild(item);
   });
 }
 
@@ -92,7 +95,10 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- Ouvrir une conversation ---
-export async function openChat(convId: string, type: "group" | "private") {
+export async function openChat(chatId: string, type: "group" | "private") {
+  convId = chatId;
+  const conv = conversations.find(c => c.id === chatId);
+  if (conv) conv.unread = 0; // réinitialise la pastille
   // Masquer le menu, afficher le chat
   menuPage.classList.remove("active");
   chatPage.classList.add("active");
@@ -118,8 +124,7 @@ export async function openChat(convId: string, type: "group" | "private") {
   // --- Déterminer si c'est un chat de groupe ou privé ---
   if (type === "group") {
     // Step en cours
-    const step = story.find(s => s.id === gameState.currentStep);
-
+    const step = story.find(s => s.id === gameState.currentSteps[chatId]);
     if (!step) return;
 
     // Afficher le step courant
@@ -144,11 +149,18 @@ export async function openChat(convId: string, type: "group" | "private") {
 }
 // --- Enchainement des steps ---
 export async function playStep(stepId: string, options?: { replay?: boolean }) {
-  const step = story.find(s => s.id === stepId);
-  if (!step) return;
+  if (!convId) return;
+  const chatStepId =
+  stepId ??
+  gameState.currentSteps[convId]; // convId = chat actif
 
-  gameState.currentStep = step.id;
+const step = story.find(s => s.id === chatStepId);
+if (!step) return;
 
+// on sauvegarde le step courant pour CE chat
+gameState.currentSteps[convId] = step.id;
+console.log("PLAY STEP:" , gameState.currentSteps[convId]);
+if (!step) return;
   const contact = contacts.find(c => c.id === step.contactId);
   if (!contact) return;
 

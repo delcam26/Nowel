@@ -1,15 +1,18 @@
 export interface GameState {
   playerName: string;
-  scores: Record<string, number>; // tes scores existants
+  scores: Record<string, number>;
   personalities: {
     dog: number;
-    owl: number;
+    rabbit: number;
     dragon: number;
   };
   started: boolean;
-  currentStep: string;  
+
+  currentSteps: Record<string, string>; //  step par chatId sous forme de map et plus de string
+
   history: {
-    contactId: string;
+    chatId: string;
+    contactId?: string;
     message: string;
     type: "user" | "contact" | "system";
   }[];
@@ -19,10 +22,12 @@ export const gameState: GameState = {
   scores: {},
   personalities: {
     dog: 0,
-    owl: 0,
+    rabbit: 0,
     dragon: 0
   },
   started: false,
-  currentStep: "intro_cosmo",
+  currentSteps: {
+    group: "intro_cosmo" 
+  },
   history: []
 };

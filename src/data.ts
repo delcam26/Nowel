@@ -10,6 +10,7 @@ export interface Contact {
 }
 export interface Step {
   id: string;
+  chatId: string;
   contactId:String;
   message?: string;
   inputType?: "buttons" | "text";
@@ -59,6 +60,7 @@ export interface Conversation {
   avatar: string;
   type: ConversationType;
  visible: boolean;
+ unread?: number; // messages non lus
 }
 
 export const conversations: Conversation[] = [
@@ -67,8 +69,7 @@ export const conversations: Conversation[] = [
     name: "Let's Party",
     avatar: "./assets/images/group.jpg",
     type: "group",
-     visible: true,
-  },
+     visible: true},
   ...contacts.map(c => ({
     id: c.id,
     name: c.name,
@@ -81,6 +82,7 @@ export const conversations: Conversation[] = [
 export const story: Step[] = [
   {
     id: "intro_cosmo",
+    chatId:"group",
     contactId: "cosmo",
     action: "join",
     actionOrder: "before",
@@ -89,6 +91,7 @@ export const story: Step[] = [
   },
  {
     id: "intro_blaaj",
+    chatId:"group",
     contactId: "blaaj",
     message: "C'est qui lui ?",
     inputType: "text",
@@ -98,6 +101,7 @@ export const story: Step[] = [
   },
 {
     id: "croc_blaaj",
+    chatId:"group",
     contactId: "blaaj",
     message: "Ca a l'air bon ça du {{playerName}}, j'en ferais bien mon 4h",
     nextStep: "stuck_house",
@@ -106,6 +110,7 @@ export const story: Step[] = [
   // --- DÉBUT DE TON HISTOIRE COSMO BLOQUÉ ---
   {
     id: "stuck_house",
+    chatId:"group",
     contactId:"cosmo",
     message: "Je suis rentrée par erreur chez une humaine… et elle a fermé la fenêtre derrière moi ! 😰 Je fais quoi ?",
     inputType: "buttons",
@@ -117,7 +122,7 @@ export const story: Step[] = [
       },
       {
         text: "Elle dort ? Si oui attends demain sinon cage directe.",
-        personalityPoints: { owl: 1 },
+        personalityPoints: { rabbit: 1 },
         nextStep: "B1_human_approaches"
       },
       {
@@ -129,6 +134,7 @@ export const story: Step[] = [
   },
   {
     id: "A1_bambi",
+    chatId:"group",
     contactId:"cosmo",
     message: "J'ai pas l'adresse tu te doutes ... je crois que j'ai vu un panneau 'Bambie chie'",
     inputType: "buttons",
@@ -140,7 +146,7 @@ export const story: Step[] = [
       },
       {
         text: "Envoie une photo, j'aime bien les défis",
-        personalityPoints: { owl: 1 },
+        personalityPoints: { rabbit: 1 },
         nextStep: "2_sauvee"
       },
       {
@@ -152,6 +158,7 @@ export const story: Step[] = [
   },
     {
     id: "B1_human_approaches",
+    chatId:"group",
     contactId:"cosmo",
     message: "Je l'ai reveillée en cherchant la sortie, elle s'approche de moi ...",
     inputType: "buttons",
@@ -163,7 +170,7 @@ export const story: Step[] = [
       },
       {
         text: "Reste tranquille et fait lui tes plus beaux yeux tristes pour l'attendrir.",
-        personalityPoints: { owl: 1 },
+        personalityPoints: { rabbit: 1 },
         nextStep: "2_sauvee"
       },
       {
@@ -175,13 +182,14 @@ export const story: Step[] = [
   },
     {
     id: "C1_flirt",
+    chatId:"group",
     contactId:"cosmo",
     message: "Tu sais bien que tu peux déjà tout me demander ... /blush/",
-    inputType: "buttons",
-    nextStep: " B1_blaaj_cant_wait"
+    nextStep: "B1_blaaj_cant_wait"
   },
       {
     id: "B1_blaaj_cant_wait",
+    chatId:"group",
     contactId:"blaaj",
     message: "Ca suffit les niaiseries, on y va sans elle !",
     inputType: "buttons",
@@ -192,8 +200,8 @@ export const story: Step[] = [
         nextStep: "2_sauvee"
       },
       {
-        text: "Pas faux ... je dois amener l'apéro je ne peux pas à arriver trop en retard",
-        personalityPoints: { owl: 1 },
+        text: "Je ne connais pas la route moi ... ? ",
+        personalityPoints: { rabbit: 1 },
         nextStep: "2_sauvee"
       },
       {
@@ -205,6 +213,7 @@ export const story: Step[] = [
   },
      {
     id: "2_sauvee",
+    chatId:"group",
     contactId:"cosmo",
     message: "C'est bon une autre dame est venue me jeter dehors, j'arrive les gars. {{playerName}}, tu veux que je t'accompagne à la soirée ou on se renjoint là bas ? ",
     inputType: "buttons",
@@ -215,8 +224,8 @@ export const story: Step[] = [
         nextStep: "go_prive"
       },
       {
-        text: "On va perdre du temps si on se cherche, je viens directement ! ",
-        personalityPoints: { owl: 1 },
+        text: "Ca m'arrangerait oui, vu que je ne connais personne...",
+        personalityPoints: { rabbit: 1 },
         nextStep: "go_prive"
       },
       {
@@ -226,6 +235,30 @@ export const story: Step[] = [
       }
     ]
   }
-
+,
+     {
+    id: "go_prive",
+    chatId:"cosmo",
+    contactId:"cosmo",
+    message: " Hello, désolée pour cette invitation un peu soudaine.. Tu es prêt ?  ",
+    inputType: "buttons",
+        choices: [
+      {
+        text: "Oui, toujours prêt !",
+        personalityPoints: { dog: 1 },
+        nextStep: "Depart"
+      },
+      {
+        text: "J'ai besoin de me préparer encore un peu ... Tu crois que j'ai fais mauvaise impression ? Je ne devrais peut-être pas venir ... ",
+        personalityPoints: { rabbit: 1 },
+        nextStep: "rassure"
+      },
+      {
+        text: " Oui mais j'hésite encore, tu préfère quelle tenue ?",
+        personalityPoints: { dragon: 1 },
+        nextStep: "show_outfits"
+      }
+    ]
+  }
 
 ];
