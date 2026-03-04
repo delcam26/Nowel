@@ -43,11 +43,6 @@ jobs:
       - name: Add Android platform if missing
         run: npx cap add android || true
 
-      - name: Debug Node version
-        run: |
-          node -v
-          which node
-
       - name: Sync Capacitor
         run: npx cap sync android
 
@@ -56,6 +51,10 @@ jobs:
           cd android
           chmod +x ./gradlew
           ./gradlew assembleRelease
+
+      - name: List APK files
+        run: |
+          ls -R android/app/build/outputs/apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
