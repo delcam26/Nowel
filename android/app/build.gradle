@@ -55,7 +55,7 @@ try {
 android {
     signingConfigs {
         release {
-            storeFile file('android/app/my-release-key.jks')
+            storeFile file('my-release-key.jks')
             storePassword System.getenv("RELEASE_KEYSTORE_PASSWORD")
             keyAlias System.getenv("RELEASE_KEY_ALIAS")
             keyPassword System.getenv("RELEASE_KEY_PASSWORD")
