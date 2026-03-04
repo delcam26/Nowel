@@ -27,3 +27,19 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+android {
+    signingConfigs {
+        release {
+            storeFile file('my-release-key.jks')
+            storePassword 'tonMotDePasse'
+            keyAlias 'my-key-alias'
+            keyPassword 'tonMotDePasse'
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+        }
+    }
+}
