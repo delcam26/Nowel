@@ -46,6 +46,11 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Debug Node version
+        run: |
+          node -v
+          which node
+
       - name: Build Android APK
         run: |
           cd android
