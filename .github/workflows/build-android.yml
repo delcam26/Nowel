@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Signed Android APK
 
 on:
   workflow_dispatch:
@@ -9,12 +9,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-           node-version: 20
+          node-version: 20
+          cache: npm
 
       - name: Install dependencies
         run: npm ci
@@ -37,27 +38,24 @@ jobs:
       - name: Install required SDK packages
         run: |
           sdkmanager "platform-tools"
-          sdkmanager "platforms;android-33"
-          sdkmanager "build-tools;33.0.2"
+          sdkmanager "platforms;android-34"
+          sdkmanager "build-tools;34.0.0"
 
       - name: Add Android platform if missing
         run: npx cap add android || true
 
       - name: Sync Capacitor
         run: npx cap sync android
-
-      - name: Build Android APK
+        
+      - name: Build signed release APK
         run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > android/local.properties
           cd android
-          chmod +x ./gradlew
+          chmod +x gradlew
           ./gradlew assembleRelease
-
-      - name: List APK files
-        run: |
-          ls -R android/app/build/outputs/apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-         name: apk-output
-         path: android/app/build/outputs/**/*.apk
+          name: signed-release-apk
+          path: android/app/build/outputs/apk/release/*.apk
