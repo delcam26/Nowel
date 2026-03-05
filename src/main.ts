@@ -3,6 +3,7 @@ import { contacts, Contact ,Step , Choice , story , conversations} from "./data"
 import { gameState, GameState } from "./gameState";
 import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage,getDominantPersonality,shuffleArray } from "./ui"; 
 
+alert("JS LOADED");
 // --- Mise à jour du titre du chat ---
 const chatTitle = document.getElementById("chat-title");
 const params = new URLSearchParams(window.location.search);
