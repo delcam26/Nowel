@@ -3,6 +3,14 @@ import { contacts, Contact ,Step , Choice , story , conversations} from "./data"
 import { gameState, GameState } from "./gameState";
 import { addMessage, showChoices, showTextInput, showTyping,showSystemMessage,getDominantPersonality,shuffleArray } from "./ui"; 
 
+window.addEventListener("error", (event) => {
+  console.error("Erreur JS capturée:", event.message, event.filename, event.lineno);
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Promise rejetée non gérée:", event.reason);
+});
+
 alert("JS LOADED");
 // --- Mise à jour du titre du chat ---
 const chatTitle = document.getElementById("chat-title");
@@ -10,12 +18,17 @@ const params = new URLSearchParams(window.location.search);
 let convId = params.get("conv");
 const menuPage = document.getElementById("menu-page")!;
 const chatPage = document.getElementById("chat-page")!;
+const phone = document.getElementById("phone")!;
 const conversationList = document.getElementById("conversation-list")!;
 const inputContainer = document.getElementById("input-container")!;
 
 
 window.addEventListener("beforeunload", () => {
   localStorage.setItem("gameState", JSON.stringify(gameState));
+});
+// --- Lancer le menu au démarrage ---
+window.addEventListener("DOMContentLoaded", () => {
+  showMenu(); // afficher le menu
 });
 
 // --- Afficher la liste des conversations
@@ -90,10 +103,6 @@ export function showContactDetails(contactId: string) {
   backBtn.onclick = () => openChat(contactId,"private"); // revenir dans le chat
   game.appendChild(backBtn);
 }
-// --- Lancer le menu au démarrage ---
-window.addEventListener("DOMContentLoaded", () => {
-  showMenu();
-});
 
 // --- Ouvrir une conversation ---
 export async function openChat(chatId: string, type: "group" | "private") {
@@ -208,6 +217,6 @@ if (!step) return;
 const backBtn = document.getElementById("back-btn") as HTMLButtonElement;
 if (backBtn) {
   backBtn.addEventListener("click", () => {
-    window.location.href = "/Nowel/menu.html ";
+    window.location.href = "menu.html ";
   });
 }
