@@ -1,6 +1,8 @@
 name: Build Signed Android APK
 
 on:
+  push:
+    branches: [main]   # ou ton branche principale
   workflow_dispatch:
 
 jobs:
