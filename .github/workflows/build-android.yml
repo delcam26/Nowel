@@ -17,12 +17,6 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build web app
-        run: npm run build
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
