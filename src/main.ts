@@ -208,6 +208,6 @@ if (!step) return;
 const backBtn = document.getElementById("back-btn") as HTMLButtonElement;
 if (backBtn) {
   backBtn.addEventListener("click", () => {
-    window.location.href = "/Nowel/menu.html ";
+    window.location.href = "menu.html ";
   });
 }
