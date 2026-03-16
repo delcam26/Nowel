@@ -46,7 +46,10 @@ jobs:
       - name: Add Android platform if missing
         run: npx cap add android || true
 
-      - name: Sync Capacitor
+      - name: Copy web assets
+        run: npx cap copy android
+
+      - name: Sync Capacitor plugins
         run: npx cap sync android
         
       - name: Build signed release APK
