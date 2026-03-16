@@ -55,8 +55,8 @@ jobs:
       - name: Sync Capacitor plugins
         run: npx cap sync android
 
-       - name: Debug Android structure
-         run: ls -R android
+      - name: Debug Android structure
+        run: ls -R android
         
       - name: Build signed release APK
         env:
